@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle de Textos Padrão</title>
+<style>
+:root {
+    color-scheme: dark;
+    --bg: #071426;
+    --panel: #0d2038;
+    --text: #e8f0ff;
+    --muted: #a5b8d5;
+    --line: #263f60;
+    --primary: #2563b9;
+    --primary-dark: #3478d2;
+    --soft: #173b67;
+    --success: #65d6a2;
+    --navy: #071426;
+    --blue-light: #d8e8ff;
+    --control: #091a2e;
+    --hover: #122c4b;
+}
+:root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #eef3fa;
+    --panel: #ffffff;
+    --text: #14233b;
+    --muted: #65758b;
+    --line: #d5dfed;
+    --primary: #174a8b;
+    --primary-dark: #103765;
+    --soft: #e6effb;
+    --success: #067647;
+    --control: #ffffff;
+    --hover: #f4f7fb;
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.5;
+}
+header {
+    background: linear-gradient(125deg, #0b1f3a 0%, #123b70 58%, #1a528e 100%);
+    color: white;
+    padding: 30px 20px 27px;
+    border-bottom: 4px solid #6ea8f7;
+}
+.header-inner { position: relative; }
+.brand-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+.brand-mark {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 12px;
+    background: rgba(255,255,255,.10);
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -.04em;
+}
+.creator {
+    margin-top: 13px;
+    color: #d8e8ff;
+    font-size: .88rem;
+    letter-spacing: .02em;
+}
+.creator strong { color: #ffffff; }
+.header-inner, main { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
+header h1 { margin: 0 0 6px; font-size: clamp(1.5rem, 4vw, 2.1rem); }
+header p { margin: 0; color: #d7e4ff; }
+main { padding: 24px 0 48px; }
+.layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 20px; align-items: start; }
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 8px 26px rgba(16, 42, 86, .07);
+}
+.sidebar { position: sticky; top: 16px; }
+h2 { margin: 0 0 14px; font-size: 1.15rem; }
+.search { width: 100%; margin-bottom: 12px; }
+input, select, textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 11px 12px;
+    color: var(--text);
+    background: var(--control);
+    font: inherit;
+}
+input:focus, select:focus, textarea:focus {
+    outline: 3px solid rgba(21, 94, 239, .14);
+    border-color: var(--primary);
+}
+.topic-list { display: flex; flex-direction: column; gap: 6px; max-height: 65vh; overflow: auto; }
+.topic-button {
+    border: 1px solid transparent;
+    background: transparent;
+    border-radius: 8px;
+    text-align: left;
+    padding: 10px;
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+}
+.topic-button:hover { background: #f4f7fb; }
+.topic-button.active { background: var(--soft); border-color: #b6ccff; color: #123b8a; font-weight: 700; }
+.topic-number { display: inline-block; width: 28px; color: var(--muted); font-size: .85rem; }
+.intro { color: var(--muted); margin: -5px 0 18px; font-size: .95rem; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.field { min-width: 0; }
+.field.full { grid-column: 1 / -1; }
+.field label { display: block; margin-bottom: 6px; font-weight: 700; font-size: .91rem; }
+.field small { display: block; color: var(--muted); font-size: .8rem; margin-top: 5px; }
+.field textarea { min-height: 82px; resize: vertical; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+button.action {
+    border: 0; border-radius: 9px; padding: 11px 16px;
+    font: inherit; font-weight: 700; cursor: pointer;
+    transition: background .15s ease, transform .15s ease;
+}
+button.action:hover { transform: translateY(-1px);
+}
+.primary { color: white; background: var(--primary); }
+.primary:hover { background: var(--primary-dark); }
+.secondary { background: var(--hover); color: var(--text); border: 1px solid var(--line) !important; }
+.theme-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 10px;
+    padding: 9px 13px;
+    color: #fff;
+    background: rgba(255,255,255,.10);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+.theme-toggle:hover { background: rgba(255,255,255,.19); }
+@media (max-width: 560px) {
+    .theme-toggle { position: static; margin-top: 14px; }
+}
+.output-wrap { margin-top: 22px; }
+.output-wrap textarea { min-height: 300px; font-family: Consolas, "Courier New", monospace; white-space: pre-wrap; }
+.status { color: var(--success); font-size: .9rem; min-height: 1.4em; margin-top: 8px; }
+.empty { color: var(--muted); padding: 18px 8px; }
+.footer-note { margin-top: 18px; color: var(--muted); font-size: .85rem; }
+@media (max-width: 850px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+    .topic-list { max-height: 250px; }
+}
+@media (max-width: 560px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .field.full { grid-column: auto; }
+    .panel { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<header>
+    <div class="header-inner">
+        <div class="brand-line">
+            <div class="brand-mark" aria-hidden="true">ML</div>
+            <div>
+                <h1>Controle de Textos Padrão</h1>
+                <p>Equatorial</p>
+            </div>
+        </div>
+        <p>Selecione o atendimento, preencha os campos e gere o texto pronto para copiar.</p>
+        <div class="creator">Criado por <strong>Marcley Lima</strong></div>
+        <button class="theme-toggle" type="button" id="themeToggle" aria-label="Alternar modo de cor">☀️ Modo claro</button>
+    </div>
+</header>
+
+<main>
+    <div class="layout">
+        <aside class="panel sidebar">
+            <h2>Tipos de atendimento</h2>
+            <input id="searchTopics" class="search" type="search" placeholder="Buscar tópico..." aria-label="Buscar tópico">
+            <div id="topicList" class="topic-list"></div>
+        </aside>
+
+        <section class="panel">
+            <div id="formHeading">
+                <h2>Escolha um tópico</h2>
+                <p class="intro">Os campos aparecem de acordo com as informações exigidas pelo texto padrão selecionado.</p>
+            </div>
+            <form id="templateForm">
+                <div id="fields" class="form-grid">
+                    <p class="empty">Selecione um tipo de atendimento na lista à esquerda.</p>
+                </div>
+                <div class="actions">
+                    <button class="action primary" type="submit">Criar texto</button>
+                    <button class="action secondary" type="button" id="clearButton">Limpar campos</button>
+                </div>
+            </form>
+            <div class="output-wrap">
+                <h2>Texto gerado</h2>
+                <textarea id="output" placeholder="O texto pronto aparecerá aqui..." aria-label="Texto gerado"></textarea>
+                <div class="actions">
+                    <button class="action primary" type="button" id="copyButton">Copiar texto</button>
+                    <button class="action secondary" type="button" id="selectButton">Selecionar texto</button>
+                </div>
+                <div id="status" class="status" role="status" aria-live="polite"></div>
+            </div>
+            <p class="footer-note">Os dados digitados ficam apenas nesta página. Confira nomes, números, datas e informações antes de copiar para o sistema oficial.</p>
+            <p class="footer-note"><strong>Desenvolvido por Marcley Lima</strong> · Ferramenta local de apoio ao atendimento.</p>
+        </section>
+    </div>
+</main>
+
+<script>
+const root = document.documentElement;
+const themeToggle = document.getElementById("themeToggle");
+root.dataset.theme = "dark";
+themeToggle.addEventListener("click", () => {
+    const isDark = root.dataset.theme !== "light";
+    root.dataset.theme = isDark ? "light" : "dark";
+    themeToggle.textContent = isDark ? "🌙 Modo escuro" : "☀️ Modo claro";
+    themeToggle.setAttribute("aria-label", isDark ? "Ativar modo escuro" : "Ativar modo claro");
+});
+
+const F = (key, label, options = {}) => ({ key, label, ...options });
+const T = (id, title, fields, build, description = "") => ({ id, title, fields, build, description });
+
+const topics = [
+T(1, "Conexão permanente", [
+F("fase","Fase"), F("disjuntor","Disjuntor"), F("endereco","Endereço", {full:true}),
+F("referencia","Ponto de referência", {full:true}), F("coordenadas","Coordenadas geográficas", {placeholder:"Latitude; longitude",full:true}),
+F("telefone","Telefone"), F("whatsapp","WhatsApp"), F("externo","Padrão instalado externamente?",{type:"select",options:["SIM","NÃO"]}),
+F("rede","Possui rede elétrica próxima ao imóvel?",{type:"select",options:["SIM","NÃO"]}),
+F("checklist","Checklist do padrão montado assinado pelo cliente?",{type:"select",options:["SIM","NÃO"]}),
+F("mesmoEndereco","Endereço da conexão é o mesmo da correspondência?",{type:"select",options:["SIM","NÃO"]}),
+F("endCorrespondencia","Endereço de correspondência",{full:true}), F("email","E-mail válido",{full:true}),
+F("duplicidade","Análise de duplicidade de cadastro?",{type:"select",options:["SIM","NÃO"]}),
+F("carregadores","Possui ou contará com carregadores para veículos elétricos? Informe potência/modelo ou 'Não informado'.",{full:true,placeholder:"Potência e modelo da estação ou carregador portátil"})
+], v => `CONEXÃO PERMANENTE
+FASE: ${v.fase}
+DISJUNTOR: ${v.disjuntor}
+ENDEREÇO: ${v.endereco}
+PONTO DE REFERÊNCIA: ${v.referencia}
+COORDENADAS GEOGRÁFICAS: ${v.coordenadas}
+TELEFONE: ${v.telefone}
+WHATSAPP: ${v.whatsapp}
+PADRÃO INSTALADO EXTERNAMENTE? ${v.externo}
+POSSUI REDE ELÉTRICA PRÓXIMA AO IMÓVEL? ${v.rede}
+CHECKLIST DO PADRÃO MONTADO ASSINADO PELO CLIENTE? ${v.checklist}
+ENDEREÇO DA CONEXÃO É O MESMO ENDEREÇO DE CORRESPONDÊNCIA? ${v.mesmoEndereco}
+ENDEREÇO DE CORRESPONDÊNCIA: ${v.endCorrespondencia}
+E-MAIL VÁLIDO: ${v.email}
+ANÁLISE DE DUPLICIDADE DE CADASTRO? ${v.duplicidade}
+A INSTALAÇÃO POSSUI OU CONTARÁ COM CARREGADORES PARA VEÍCULOS ELÉTRICOS: ${v.carregadores}
+
+CLIENTE VEIO AO ATENDIMENTO E SOLICITOU CONEXÃO. CIENTE DO PRAZO DE VISTORIA E QUE, EM CASO DE PADRÃO INCOMPLETO/INEXISTENTE, SEU PEDIDO SERÁ REJEITADO.
+ANEXO DOCUMENTO DO SOLICITANTE E FORMULÁRIO DE CONEXÃO ASSINADO.`),
+
+T(2, "Conexão provisória", [
+F("atividade","Atividade a ser desenvolvida",{full:true}), F("medicao","Tipo de ligação",{type:"select",options:["COM MEDIÇÃO","SEM MEDIÇÃO"]}),
+F("endereco","Endereço",{full:true}), F("ligarDia","Ligar dia"), F("ligarHora","A partir de (hora)"),
+F("desligarDia","Desligar dia"), F("desligarHora","A partir de (hora)"), F("fase","Fase"), F("carga","Carga declarada"),
+F("telefone","Telefone"), F("nome","Nome completo"), F("mae","Nome da mãe"), F("nascimento","Data de nascimento",{placeholder:"DD/MM/AAAA"}), F("naturalidade","Naturalidade")
+], v => `CONEXÃO PROVISÓRIA
+CLIENTE SOLICITA LIGAÇÃO PROVISÓRIA PARA: ${v.atividade}
+TIPO: ${v.medicao}
+ENDEREÇO: ${v.endereco}
+LIGAR DIA: ${v.ligarDia} A PARTIR DAS ${v.ligarHora}
+DESLIGAR DIA: ${v.desligarDia} A PARTIR DAS ${v.desligarHora}
+FASE: ${v.fase}
+CARGA DECLARADA: ${v.carga}
+TELEFONE: ${v.telefone}
+CLIENTE CIENTE DE TODAS AS INFORMAÇÕES.
+NOME COMPLETO: ${v.nome}
+NOME DA MÃE: ${v.mae}
+DATA DE NASCIMENTO: ${v.nascimento}
+NATURALIDADE: ${v.naturalidade}`),
+
+T(3, "Reativação", [
+F("fase","Fase"), F("cabo","Cabo"), F("disjuntor","Disjuntor"), F("referencia","Ponto de referência",{full:true}),
+F("telefone","Telefone"), F("coordenadas","Coordenadas",{full:true}), F("prazo","Prazo informado",{placeholder:"05 dias úteis"})
+], v => `REATIVAÇÃO
+PADRÃO INSTALADO: FASE: ${v.fase} CABO: ${v.cabo} DISJUNTOR: ${v.disjuntor}
+REFERÊNCIA: ${v.referencia}
+TELEFONE: ${v.telefone}
+COORDENADAS: ${v.coordenadas}
+CLIENTE AFIRMA QUE JÁ POSSUI INSTALADO O PADRÃO DENTRO DO LIMITE DA VIA PÚBLICA E ESTÁ CIENTE DE QUE, CASO SEJA INEXISTENTE, SEU PEDIDO SERÁ REJEITADO.
+CLIENTE CIENTE DO PRAZO DE ${v.prazo} PARA EXECUÇÃO.`),
+
+T(4, "Carta de deferimento", [
+F("recebedor","Nome de quem recebeu a carta"), F("assinada","Carta assinada no anexo da nota?",{type:"select",options:["SIM","NÃO"]})
+], v => `DOCUMENTAÇÃO APROVADA.
+CARTA DE DEFERIMENTO ENTREGUE EM MÃOS A ${v.recebedor}.
+CARTA ASSINADA NO ANEXO DA NOTA: ${v.assinada}.`),
+
+T(5, "Troca de titularidade", [
+F("novoNome","Nome do solicitante / novo titular"), F("rg","RG"), F("cpf","CPF"), F("instalacao","Número da instalação/conta contrato"),
+F("titularAtual","Nome do titular atual"), F("motivo","Motivo da troca",{full:true}), F("ocupacao","Data de ocupação",{placeholder:"DD/MM/AAAA"}),
+F("debitos","Há débitos na instalação?",{type:"select",options:["SIM","NÃO"]}), F("valorDebitos","Valor dos débitos (se houver)"),
+F("receita","CPF/CNPJ consultado na Receita Federal e situação regular/ativa?",{type:"select",options:["SIM","NÃO"]})
+], v => `CLIENTE SR(A). ${v.novoNome}, RG ${v.rg}, CPF ${v.cpf}, SOLICITA TROCA DE TITULARIDADE DA INSTALAÇÃO ${v.instalacao}, QUE SE ENCONTRA EM NOME DE ${v.titularAtual}.
+MOTIVO DA TROCA: ${v.motivo}
+DATA DE OCUPAÇÃO: ${v.ocupacao}
+DÉBITOS NA INSTALAÇÃO: ${v.debitos}${v.debitos==="SIM" ? ", VALOR: "+v.valorDebitos : ""}
+CPF/CNPJ CONSULTADO NO SITE DA RECEITA FEDERAL, COM SITUAÇÃO CADASTRAL REGULAR/ATIVA NO MOMENTO DO ATENDIMENTO: ${v.receita}.`),
+
+T(6, "Análise de troca de titularidade", [
+F("conta","Conta contrato"), F("titularAtual","Nome do titular atual",{full:true}), F("novoTitular","Nome do novo titular"), F("rg","RG"), F("cpf","CPF"),
+F("motivo","Motivo da troca"), F("vigencia","Data de vigência",{placeholder:"DD/MM/AAAA"}), F("classe","Classe de consumo"),
+F("status","Status da instalação",{type:"select",options:["LIGADA","CORTADA","DESLIGADA"]}), F("observacoes","Observações",{full:true})
+], v => `FAVOR REALIZAR A TROCA DE TITULARIDADE DA CC ${v.conta}, QUE SE ENCONTRA EM NOME DE ${v.titularAtual}, PARA O NOME DO NOVO TITULAR ${v.novoTitular}, RG ${v.rg}, CPF ${v.cpf}.
+MOTIVO DA TROCA: ${v.motivo}
+DATA DE VIGÊNCIA: ${v.vigencia}
+CLASSE DE CONSUMO: ${v.classe}
+STATUS DA INSTALAÇÃO: ${v.status}
+OBSERVAÇÕES: ${v.observacoes || "NÃO INFORMADAS"}`),
+
+T(7, "Troca de titularidade com transferência de débito", [
+F("conta","Conta contrato"), F("titularAtual","Nome do titular atual",{full:true}), F("novoTitular","Nome do novo titular"), F("rg","RG"), F("cpf","CPF"),
+F("autorizacao","Termos autorizados/assinados",{full:true,placeholder:"DTT, TATD, TCD e aditivo de parcelamento"}), F("entrada","Valor da entrada"), F("parcelas","Quantidade de parcelas",{placeholder:"Ex.: 18"})
+], v => `TROCA COM TRANSFERÊNCIA E PARCELAMENTO.
+FAVOR REALIZAR A TROCA DE TITULARIDADE COM TRANSFERÊNCIA E PARCELAMENTO DOS DÉBITOS DA CC ${v.conta}, QUE SE ENCONTRA EM NOME DE ${v.titularAtual}, PARA O NOME DO NOVO TITULAR ${v.novoTitular}, RG ${v.rg}, CPF ${v.cpf}, AUTORIZADO PELO SOLICITANTE MEDIANTE ASSINATURA DOS TERMOS ${v.autorizacao}, ANEXOS DENTRO DA NOTA.
+SIMULAÇÃO DE PARCELAMENTO:
+ENTRADA: ${v.entrada}
+PARCELAS: ${v.parcelas}`),
+
+T(8, "Desligamento", [
+F("referencia","Ponto de referência"), F("motivo","Motivo"), F("faturamento","Faturamento final",{type:"select",options:["CONSUMO ESTIMADO","LEITURA DO CLIENTE"]}),
+F("leitura","Leitura informada (se aplicável)"), F("titular","Nome do titular"), F("agencia","Agência de atendimento"), F("conta","Conta contrato")
+], v => `REFERÊNCIA: ${v.referencia}
+MOTIVO: ${v.motivo}
+FATURAMENTO FINAL: ${v.faturamento}${v.faturamento==="LEITURA DO CLIENTE" ? " — LEITURA: "+v.leitura : ""}
+CLIENTE TITULAR ${v.titular} COMPARECEU À AGÊNCIA ${v.agencia} PARA SOLICITAR O DESLIGAMENTO DE SUA CONTA CONTRATO ${v.conta}. CLIENTE CIENTE DE QUE, CASO HAJA DÉBITOS PENDENTES, DEVERÁ QUITÁ-LOS PARA QUE SEU NOME NÃO SEJA NEGATIVADO, E CIENTE DO PRAZO DE ATÉ 30 DIAS PARA DESLIGAMENTO EM CAMPO.`),
+
+T(9, "Segunda via", [
+F("nome","Nome do solicitante"), F("vinculo","Relação com a instalação",{type:"select",options:["TITULAR","PARENTE","INQUILINO","OUTRO"]}),
+F("rg","RG"), F("cpf","CPF"), F("mes","Mês/ano da fatura",{placeholder:"MM/AAAA"}), F("valor","Valor da fatura")
+], v => `SR(A). ${v.nome} (${v.vinculo}), RG ${v.rg}, CPF ${v.cpf}, SOLICITA A SEGUNDA VIA DA FATURA DO MÊS ${v.mes}, NO VALOR DE R$ ${v.valor}.`),
+
+T(10, "Religação", [
+F("tipo","Tipo de religação",{type:"select",options:["COMUM","URGÊNCIA"]}), F("solicitante","Nome do solicitante"), F("meses","Faturas apresentadas / meses",{full:true}),
+F("vencimentos","Vencimentos",{full:true}), F("pagamentoTipo","Tipo de pagamento"), F("pagamentoData","Data do pagamento",{placeholder:"DD/MM/AAAA"}),
+F("cnr","Fatura CNR?",{type:"select",options:["NÃO","SIM"]}), F("cnrInfo","Referência e valor CNR"),
+F("bloqueadas","Faturas bloqueadas?",{type:"select",options:["NÃO","SIM"]}), F("bloqueadasInfo","Referência e valor das bloqueadas"),
+F("prescritas","Faturas prescritas?",{type:"select",options:["NÃO","SIM"]}), F("prescritasInfo","Referência e valor das prescritas"),
+F("taxa","Taxa de religação informada",{type:"select",options:["MONOFÁSICO — R$ 11,30","BIFÁSICO — R$ 15,57","TRIFÁSICO — R$ 46,75","ALTA TENSÃO — R$ 141,78"]}),
+F("receita","CPF/CNPJ consultado na Receita Federal e situação regular/ativa?",{type:"select",options:["SIM","NÃO"]})
+], v => `EQUIPE, CLIENTE SOLICITA RELIGAÇÃO ${v.tipo}. COMPROVANTE DE PAGAMENTO APRESENTADO NA AGÊNCIA.
+SOLICITANTE: ${v.solicitante}
+FATURAS APRESENTADAS: ${v.meses}
+VENCIMENTOS: ${v.vencimentos}
+TIPO E DATA DO PAGAMENTO: ${v.pagamentoTipo} — ${v.pagamentoData}
+FATURA CNR: ${v.cnr}${v.cnr==="SIM" ? " — "+v.cnrInfo : ""}
+FATURAS BLOQUEADAS: ${v.bloqueadas}${v.bloqueadas==="SIM" ? " — "+v.bloqueadasInfo : ""}
+FATURAS PRESCRITAS: ${v.prescritas}${v.prescritas==="SIM" ? " — "+v.prescritasInfo : ""}
+CLIENTE CIENTE DA TAXA DE RELIGAÇÃO: ${v.taxa}
+CPF/CNPJ CONSULTADO NO SITE DA RECEITA FEDERAL, COM SITUAÇÃO CADASTRAL REGULAR/ATIVA NO MOMENTO DO ATENDIMENTO: ${v.receita}.`),
+
+T(11, "Parcelamento", [
+F("nome","Nome do cliente"), F("rg","RG"), F("cpf","CPF"), F("data","Data do parâmetro",{placeholder:"DD/MM/AAAA"}),
+F("entradaPercentual","Percentual da entrada",{placeholder:"Ex.: 50%"}), F("entradaValor","Valor da entrada",{placeholder:"R$ 350,00"}),
+F("quantidade","Quantidade de parcelas",{placeholder:"Ex.: 6"}), F("valorParcela","Valor de cada parcela",{placeholder:"R$ 54,60"})
+], v => `CLIENTE ${v.nome}, RG ${v.rg}, CPF ${v.cpf}, SOLICITA PARCELAMENTO CONFORME PARÂMETRO NO DIA ${v.data}.
+ENTRADA: ${v.entradaPercentual} (${v.entradaValor})
+QUANTIDADE DE PARCELAS: ${v.quantidade}X (${v.valorParcela}).`),
+
+T(12, "Informação", [
+F("procedimento","Procedimento"), F("indeferimento","Motivo do indeferimento"), F("acompanhamento","Motivo do acompanhamento"), F("orientacao","Orientação",{full:true})
+], v => `PROCEDIMENTO: ${v.procedimento}
+MOTIVO DO INDEFERIMENTO: ${v.indeferimento}
+MOTIVO DO ACOMPANHAMENTO: ${v.acompanhamento}
+ORIENTAÇÃO: ${v.orientacao}`),
+
+T(13, "Reclamação", [
+F("descricao","Descrição da reclamação",{full:true}), F("solucao","Solução pretendida pelo cliente",{full:true}), F("analise","Análise do atendente: consultas, orientações e esclarecimentos",{full:true}),
+F("meio","Meio de resposta",{type:"select",options:["TELEFONE","CARTA","E-MAIL"]}), F("whatsapp","Aceita receber resposta/fatura via WhatsApp?",{type:"select",options:["SIM","NÃO"]}),
+F("telefone","Telefone para contato (DDD)"), F("horario","Melhor horário para contato",{type:"select",options:["MANHÃ","TARDE"]}),
+F("email","E-mail",{placeholder:"Se não possui, escreva: não informado"}), F("terceiros","Autoriza terceiros?",{type:"select",options:["SIM","NÃO"]}),
+F("complementares","Informações complementares / documentos anexados / reincidência",{full:true})
+], v => `DESCRIÇÃO DA RECLAMAÇÃO: ${v.descricao}
+SOLUÇÃO PRETENDIDA: ${v.solucao}
+ANÁLISE DO ATENDENTE: ${v.analise}
+MEIO DE RESPOSTA DA RECLAMAÇÃO: ${v.meio}
+ACEITA RECEBER RESPOSTA/FATURA VIA WHATSAPP: ${v.whatsapp}
+TELEFONE PARA CONTATO: ${v.telefone}
+MELHOR HORÁRIO PARA CONTATO: ${v.horario}
+E-MAIL: ${v.email || "não informado"}
+AUTORIZA TERCEIROS: ${v.terceiros}
+INFORMAÇÕES COMPLEMENTARES: ${v.complementares}
+APESAR DE TODOS OS ESCLARECIMENTOS, CLIENTE OPTOU PELA ABERTURA DA RECLAMAÇÃO.`),
+
+T(14, "Danos elétricos", [
+F("titular","Nome da reclamante titular"), F("dataHora","Data e hora da ocorrência",{placeholder:"DD/MM/AAAA por volta de HH:MM"}), F("ocorrencia","Descrição do que ocorreu",{full:true}),
+F("responsabilidade","Por que supõe que a responsabilidade seja da empresa?",{full:true}), F("equip1","Equipamento 1 — tipo, capacidade, marca, modelo, tempo de uso e se foi consertado",{full:true}),
+F("equip2","Equipamento 2 — tipo, capacidade, marca, modelo, tempo de uso e se foi consertado",{full:true}),
+F("outras","Atingiu outras residências/instalações?",{type:"select",options:["SIM","NÃO"]}),
+F("oscilacao","Faltou energia ou houve oscilação antes da queima?",{type:"select",options:["SIM","NÃO"]}),
+F("funcionario","Havia funcionário da empresa no local executando serviço?",{type:"select",options:["SIM","NÃO"]}),
+F("telefoneFixo","Possui telefone fixo/antena parabólica?",{type:"select",options:["SIM","NÃO"]}), F("chuva","Chovia no dia da ocorrência?",{type:"select",options:["SIM","NÃO"]}),
+F("meio","Meio de comunicação escolhido",{type:"select",options:["TELEFONE","CARTA","E-MAIL"]}), F("telefoneExtra","Telefone extra para contato"),
+F("autorizado","Pessoa autorizada a receber resposta: nome, parentesco e telefone",{full:true}),
+F("ressarcimento","Forma de ressarcimento preferida",{type:"select",options:["CONTA BANCÁRIA","ORDEM DE PAGAMENTO","CRÉDITO EM FATURA","ABATIMENTO DA DÍVIDA"]})
+], v => `SRA. RECLAMANTE TITULAR: ${v.titular}
+DESCRIÇÃO DA OCORRÊNCIA COM DATA/HORA: ${v.ocorrencia} — ${v.dataHora}
+RELATO DO MOTIVO POR QUE SUPÕE QUE A RESPONSABILIDADE SEJA DA EMPRESA: ${v.responsabilidade}
+DESCRIÇÃO DOS EQUIPAMENTOS DANIFICADOS:
+EQUIPAMENTO 1: ${v.equip1}
+EQUIPAMENTO 2: ${v.equip2}
+CHECKLIST:
+ATINGIU OUTRAS RESIDÊNCIAS/INSTALAÇÕES: ${v.outras}
+FALTOU ENERGIA OU A ENERGIA OSCILAVA ANTES DA QUEIMA: ${v.oscilacao}
+HAVIA FUNCIONÁRIO DA EMPRESA NO LOCAL EXECUTANDO ALGUM SERVIÇO: ${v.funcionario}
+POSSUI TELEFONE FIXO/ANTENA PARABÓLICA: ${v.telefoneFixo}
+CHOVIA NO DIA DA OCORRÊNCIA: ${v.chuva}
+SOLUÇÃO PRETENDIDA: RESSARCIMENTO DOS EQUIPAMENTOS QUEIMADOS
+MEIO DE COMUNICAÇÃO ESCOLHIDO PELO CLIENTE: ${v.meio}
+TELEFONE EXTRA PARA CONTATO: ${v.telefoneExtra}
+AUTORIZAÇÃO DE OUTRA PESSOA PARA RECEBER RESPOSTA: ${v.autorizado}
+FORMA DE RESSARCIMENTO CASO A RECLAMAÇÃO SEJA PROCEDENTE: ${v.ressarcimento}`),
+
+T(15, "Aferição", [
+F("cliente","Nome do cliente"), F("conta","Conta contrato"), F("supervisao","Anuência da supervisão confirmada?",{type:"select",options:["SIM","NÃO"]}),
+F("taxa","Cliente ciente da taxa de cobrança?",{type:"select",options:["SIM","NÃO"]}), F("documento","Documento preenchido, datado e assinado?",{type:"select",options:["SIM","NÃO"]})
+], v => `SOLICITADO O PEDIDO DE AFERIÇÃO POR ÓRGÃO METROLÓGICO, COM A DEVIDA ANUÊNCIA DA SUPERVISÃO: ${v.supervisao}. CLIENTE ${v.cliente}, TITULAR DA CC ${v.conta}, ESTÁ CIENTE DA TAXA DE COBRANÇA: ${v.taxa}. O DOCUMENTO EM ANEXO FOI DEVIDAMENTE PREENCHIDO, DATADO E ASSINADO: ${v.documento}.`),
+
+T(16, "Nível de tensão", [
+F("cliente","Nome do cliente"), F("duracao","Há quanto tempo ocorre o problema?",{placeholder:"Ex.: há mais de 7 dias"}),
+F("frequencia","Frequência",{type:"select",options:["TODOS OS DIAS","FIM DE SEMANA","ALGUNS DIAS DA SEMANA"]}), F("dias","Quais dias da semana?"),
+F("periodo","Período",{type:"select",options:["MANHÃ","TARDE","NOITE","HORÁRIOS VARIADOS"]}), F("comodos","Acontece em todos os cômodos ou apenas alguns?",{full:true}),
+F("equipamento","Adquiriu equipamento elétrico recentemente?",{type:"select",options:["SIM","NÃO"]}), F("comercio","Conhece comércio, oficina ou indústria próxima?",{full:true}),
+F("meio","Meio de comunicação"), F("referencia","Ponto de referência"), F("contato","Contato")
+], v => `SR(A). ${v.cliente} RECLAMA QUE ESTÁ OCORRENDO OSCILAÇÃO DE TENSÃO NA INSTALAÇÃO ${v.duracao}.
+INFORMA QUE OCORRE: ${v.frequencia}
+DIAS ESPECÍFICOS: ${v.dias}
+PERÍODO: ${v.periodo}
+ACONTECE EM TODOS OS CÔMODOS OU APENAS EM ALGUNS: ${v.comodos}
+ADQUIRIU ALGUM ELETRODOMÉSTICO OU EQUIPAMENTO ELÉTRICO RECENTEMENTE? ${v.equipamento}
+CONHECE ALGUM COMÉRCIO, OFICINA OU INDÚSTRIA PRÓXIMA À RESIDÊNCIA? ${v.comercio}
+MEIO DE COMUNICAÇÃO: ${v.meio}
+PONTO DE REFERÊNCIA: ${v.referencia}
+CONTATO: ${v.contato}`),
+
+T(17, "Problema com equipamento", [
+F("cliente","Nome do cliente"), F("referencia","Ponto de referência"), F("contato","Contato"),
+F("medidor","Problema informado no medidor",{full:true}), F("prazo","Cliente ciente do prazo de atendimento?",{type:"select",options:["SIM","NÃO"]})
+], v => `SR(A). ${v.cliente} VEIO AO ATENDIMENTO COM RG E CPF SOLICITAR VISITA TÉCNICA EM SEU IMÓVEL, POIS AFIRMA QUE SEU MEDIDOR ESTÁ APRESENTANDO DEFEITOS: ${v.medidor}. COMO FORMA DE RESPALDO E PRECAVENDO-SE, ABRIU SOLICITAÇÃO PARA REGULARIZAÇÃO. APRESENTOU RG E CPF E ESTÁ CIENTE DO PRAZO DE ATENDIMENTO: ${v.prazo}.
+PONTO DE REFERÊNCIA: ${v.referencia}
+CONTATO: ${v.contato}`),
+
+T(18, "Emergencial — falta de energia individual", [
+F("referencia","Ponto de referência"), F("telefone","Telefone"), F("disjuntor","Cliente testou o disjuntor?",{type:"select",options:["SIM","NÃO"]}), F("observacoes","Informações adicionais",{full:true})
+], v => `#AG# PONTO DE REF: ${v.referencia}
+TELEFONE: ${v.telefone}
+CLIENTE COMPARECEU À AGÊNCIA PARA INFORMAR QUE ESTÁ SEM ENERGIA NO LOCAL. ${v.disjuntor==="SIM" ? "JÁ REALIZOU TESTE NO DISJUNTOR." : "NÃO REALIZOU TESTE NO DISJUNTOR."} INFORMA QUE A FALTA DE ENERGIA É SOMENTE NO SEU IMÓVEL.
+INFORMAÇÕES ADICIONAIS: ${v.observacoes}`),
+
+T(19, "Emergencial — falta de energia coletiva", [
+F("referencia","Ponto de referência"), F("telefone","Telefone"), F("disjuntor","Cliente testou o disjuntor?",{type:"select",options:["SIM","NÃO"]}), F("bairro","Bairro afetado"), F("observacoes","Informações adicionais",{full:true})
+], v => `#AG# PONTO DE REF: ${v.referencia}
+TELEFONE: ${v.telefone}
+CLIENTE COMPARECEU À AGÊNCIA PARA INFORMAR QUE ESTÁ SEM ENERGIA NO LOCAL. ${v.disjuntor==="SIM" ? "JÁ REALIZOU TESTE NO DISJUNTOR." : "NÃO REALIZOU TESTE NO DISJUNTOR."} INFORMA QUE A FALTA DE ENERGIA É COLETIVA NO BAIRRO ${v.bairro}.
+INFORMAÇÕES ADICIONAIS: ${v.observacoes}`),
+
+T(20, "Emergencial — avaliação técnica de fornecimento", [
+F("cliente","Nome do cliente"), F("referencia","Ponto de referência"), F("telefone","Telefone"), F("duracao","Há quanto tempo ocorre?"),
+F("horarios","Horários em que ocorre"), F("chuva","Acontece em tempos de chuva?",{type:"select",options:["SIM","NÃO","NÃO INFORMADO"]})
+], v => `#AG# PONTO DE REF: ${v.referencia}
+TELEFONE: ${v.telefone}
+CLIENTE ${v.cliente} COMPARECEU À AGÊNCIA RELATANDO OSCILAÇÃO DA TENSÃO NO IMÓVEL. O PROBLEMA ACONTECE HÁ ${v.duracao}, EM ${v.horarios}. OCORRE EM TEMPOS DE CHUVA: ${v.chuva}.`),
+
+T(21, "Emergencial — falta de fase", [
+F("referencia","Ponto de referência"), F("telefone","Telefone"), F("efeitos","Efeitos nos equipamentos",{full:true}), F("observacoes","Informações adicionais",{full:true})
+], v => `#AG# PONTO DE REF: ${v.referencia}
+TELEFONE: ${v.telefone}
+CLIENTE COMPARECEU À AGÊNCIA INFORMANDO QUE ESTÁ COM AUSÊNCIA DE FASE, CAUSANDO MAU FUNCIONAMENTO EM SEUS EQUIPAMENTOS: ${v.efeitos}. CLIENTE DESEJA A NORMALIZAÇÃO DO FORNECIMENTO.
+INFORMAÇÕES ADICIONAIS: ${v.observacoes}`),
+
+T(22, "Devolução de crédito", [
+F("nome","Nome do cliente"), F("rg","RG"), F("cpf","CPF"), F("referenciaCredito","Referência do crédito",{placeholder:"MM/AAAA"}),
+F("valor","Valor do crédito"), F("origem","Origem do crédito",{placeholder:"Ex.: pagamento em duplicidade"}), F("meio","Meio de reembolso solicitado",{full:true})
+], v => `CLIENTE SOLICITA DEVOLUÇÃO DE CRÉDITO.
+NOME DO CLIENTE: ${v.nome}, RG ${v.rg}, CPF ${v.cpf}
+VALOR E REFERÊNCIA DO CRÉDITO SOLICITADO: ${v.referenciaCredito} — R$ ${v.valor}
+ORIGEM DO CRÉDITO: ${v.origem}
+DESCRIÇÃO DO MEIO DE REEMBOLSO SOLICITADO: ${v.meio}`),
+
+T(23, "Baixa renda", [
+F("solicitante","Nome do cliente solicitante"), F("titularNis","Nome do titular do NIS"), F("nis","NIS"), F("codigoFamiliar","Código familiar"),
+F("cpf","CPF"), F("rg","RG"), F("mae","Nome da mãe"), F("atualizacao","Data da última atualização",{placeholder:"DD/MM/AAAA"}),
+F("prazo","Prazo informado",{placeholder:"5 dias úteis"})
+], v => `CLIENTE ${v.solicitante} SOLICITA CADASTRO BAIXA RENDA.
+NOME DO TITULAR DO NIS: ${v.titularNis}
+NIS: ${v.nis}
+CÓDIGO FAMILIAR: ${v.codigoFamiliar}
+CPF: ${v.cpf}
+RG: ${v.rg}
+NOME DA MÃE: ${v.mae}
+DATA DA ÚLTIMA ATUALIZAÇÃO: ${v.atualizacao}
+CLIENTE CIENTE DO PRAZO DE ${v.prazo}.`),
+
+T(24, "Tarifa branca", [
+F("modalidade","Modalidade tarifária solicitada",{type:"select",options:["TARIFA BRANCA","TARIFA CONVENCIONAL"]}),
+F("formulario","Formulário assinado pelo cliente anexado?",{type:"select",options:["SIM","NÃO"]}), F("prazo","Prazo do serviço informado?")
+], v => `CLIENTE SOLICITA ALTERAÇÃO DA MODALIDADE TARIFÁRIA PARA ${v.modalidade}.
+DEMAIS INFORMAÇÕES SINALIZADAS CONFORME FORMULÁRIO ASSINADO PELO CLIENTE EM ANEXO: ${v.formulario}.
+CLIENTE CIENTE A RESPEITO DO PRAZO DO SERVIÇO: ${v.prazo}.`),
+
+T(25, "Envio de fatura por WhatsApp ou e-mail", [
+F("canal","Canal de envio",{type:"select",options:["WHATSAPP","E-MAIL"]}), F("contato","Número de WhatsApp ou endereço de e-mail confirmado",{full:true}),
+F("confirmado","Contato confirmado com o cliente?",{type:"select",options:["SIM","NÃO"]})
+], v => v.canal==="WHATSAPP"
+? `A PEDIDO DO CLIENTE, EFETUOU-SE O CADASTRO PARA O ENVIO DA FATURA VIA WHATSAPP E CONFIRMOU-SE O CONTATO TELEFÔNICO ${v.contato}, QUE RECEBERÁ A FATURA DIGITAL. CONTATO CONFIRMADO: ${v.confirmado}.`
+: `A PEDIDO DO CLIENTE, EFETUOU-SE O CADASTRO PARA O ENVIO DA FATURA VIA E-MAIL E CONFIRMOU-SE O ENDEREÇO ${v.contato}, QUE RECEBERÁ A FATURA DIGITAL. CONTATO CONFIRMADO: ${v.confirmado}.`),
+
+T(26, "Mudança de medidor de local", [
+F("referencia","Ponto de referência"), F("padrao","Novo padrão instalado conforme as normas?",{type:"select",options:["SIM","NÃO"]}), F("prazo","Prazo informado",{placeholder:"5 dias úteis"})
+], v => `PONTO DE REFERÊNCIA: ${v.referencia}
+CLIENTE SOLICITA MUDANÇA DO MEDIDOR DE LOCAL E INFORMA QUE JÁ REALIZOU A INSTALAÇÃO DE UM NOVO PADRÃO CONFORME AS NORMAS PARA QUE POSSA SER ATENDIDO: ${v.padrao}.
+CLIENTE CIENTE DO PRAZO DE ${v.prazo}.`),
+
+T(27, "Deslocamento de ramal", [
+F("cliente","Nome do cliente"), F("padrao","Pontalete/padrão montado no local correto?",{type:"select",options:["SIM","NÃO"]}),
+F("medicao","Tipo de medição instalada"), F("referencia","Ponto de referência"), F("contato","Contato"), F("prazo","Prazo informado")
+], v => `SR(A). ${v.cliente} VEIO AO ATENDIMENTO COM RG E CPF SOLICITAR O DESLOCAMENTO DE SEU RAMAL. AFIRMA QUE O PONTALETE/PADRÃO ESTÁ DEVIDAMENTE MONTADO NO LOCAL CORRETO: ${v.padrao}, E ESTÁ CIENTE DO PRAZO DE ATENDIMENTO DO SERVIÇO: ${v.prazo}.
+TIPO DE MEDIÇÃO INSTALADA: ${v.medicao}
+PONTO DE REFERÊNCIA: ${v.referencia}
+CONTATO: ${v.contato}`),
+
+T(28, "Troca de padrão", [
+F("tipo","Tipo de solicitação",{type:"select",options:["COM ACRÉSCIMO DE CARGA","SEM ACRÉSCIMO DE CARGA","SEM ACRÉSCIMO — SUBSTITUIÇÃO DE CABO, MANTENDO A FASE"]}),
+F("carga","Carga/fase desejada"), F("referencia","Ponto de referência"), F("telefone","Telefone"), F("cabo","Cabo/bitola"), F("disjuntor","Disjuntor"),
+F("adequacoes","Adequações já realizadas conforme normas?",{type:"select",options:["SIM","NÃO"]}), F("prazo","Prazo informado",{placeholder:"5 dias úteis"}),
+F("observacoes","Observações adicionais",{full:true})
+], v => {
+let texto = `SOLICITAÇÃO: ${v.tipo}
+PONTO DE REFERÊNCIA: ${v.referencia}
+TELEFONE: ${v.telefone}
+`;
+if (v.tipo==="SEM ACRÉSCIMO — SUBSTITUIÇÃO DE CABO, MANTENDO A FASE") {
+texto += `CLIENTE COMPARECEU AO ATENDIMENTO SOLICITANDO TROCA DE PADRÃO SEM ACRÉSCIMO. PERMANECERÁ COM A MESMA FASE (${v.carga}), PORÉM DESEJA A SUBSTITUIÇÃO DO RAMAL PARA ${v.cabo}, COM DISJUNTOR DE ${v.disjuntor}. CLIENTE INFORMA QUE JÁ REALIZOU AS DEVIDAS ADEQUAÇÕES: ${v.adequacoes}.`;
+} else {
+texto += `CLIENTE INFORMA QUE JÁ INSTALOU O PADRÃO CONVENCIONAL DE ACORDO COM AS NORMAS TÉCNICAS. CARGA/FASE: ${v.carga}. CABO: ${v.cabo}. DISJUNTOR: ${v.disjuntor}. ADEQUAÇÕES REALIZADAS: ${v.adequacoes}.`;
+}
+return texto + `\nCLIENTE CIENTE DO PRAZO DE ${v.prazo} E DE QUE, EM CASO DE PENDÊNCIAS DE SUA RESPONSABILIDADE, O PEDIDO PODERÁ SER REJEITADO.\nOBSERVAÇÕES: ${v.observacoes}`;
+}),
+
+T(29, "Data certa", [
+F("conta","Número da instalação/conta contrato"), F("titular","Nome do titular"), F("data","Data solicitada",{placeholder:"DD/MM/AAAA"}),
+F("prazo","Prazo para nova solicitação informado",{placeholder:"12 meses"})
+], v => `CLIENTE TITULAR DA INSTALAÇÃO ${v.conta}, ${v.titular}, SOLICITA DATA CERTA PARA O DIA ${v.data}, CIENTE DO PRAZO DE ${v.prazo} PARA UMA NOVA SOLICITAÇÃO.`),
+
+T(30, "Atualização cadastral", [
+F("tipo","Tipo de atualização",{type:"select",options:["DADOS DO PARCEIRO DE NEGÓCIO","DADOS DE INSTALAÇÃO","DADOS DO LOCAL DE CONSUMO","FLAGS DE GERAÇÃO DISTRIBUÍDA"]}),
+F("cliente","Nome do cliente"), F("documentos","Documentos apresentados",{full:true}), F("enderecoSistema","Endereço do sistema"), F("enderecoDocumento","Endereço conforme documentação"),
+F("classeAtual","Classe de consumo atual"), F("classeSolicitada","Classe de consumo solicitada"),
+F("unidadeGeradora","É unidade geradora com troca de titularidade?",{type:"select",options:["SIM","NÃO"]}), F("observacoes","Observações",{full:true})
+], v => {
+if (v.tipo==="DADOS DO PARCEIRO DE NEGÓCIO") return `DADOS DO PARCEIRO DE NEGÓCIO\nSR(A). ${v.cliente} VEIO AO ATENDIMENTO PORTANDO CPF E RG E SOLICITA ATUALIZAÇÃO DOS SEUS DADOS CADASTRAIS CONFORME A DOCUMENTAÇÃO APRESENTADA.\nDOCUMENTOS APRESENTADOS: ${v.documentos}\nOBSERVAÇÕES: ${v.observacoes}`;
+if (v.tipo==="DADOS DE INSTALAÇÃO") return `DADOS DE INSTALAÇÃO\nSR(A). ${v.cliente} VEIO AO ATENDIMENTO PORTANDO CPF, RG E DOCUMENTAÇÃO PARA SOLICITAR A ALTERAÇÃO DOS DADOS CONFORME A DOCUMENTAÇÃO APRESENTADA.\nENDEREÇO DO SISTEMA: ${v.enderecoSistema}\nENDEREÇO CONFORME A DOCUMENTAÇÃO APRESENTADA: ${v.enderecoDocumento}\nDOCUMENTOS APRESENTADOS: ${v.documentos}\nOBSERVAÇÕES: ${v.observacoes}`;
+if (v.tipo==="DADOS DO LOCAL DE CONSUMO") return `DADOS DO LOCAL DE CONSUMO\nSR(A). ${v.cliente} VEIO AO ATENDIMENTO PORTANDO CPF, RG E DOCUMENTAÇÃO PARA SOLICITAR A ALTERAÇÃO DOS DADOS CONFORME A DOCUMENTAÇÃO APRESENTADA.\nCLASSE DE CONSUMO DO SISTEMA: ${v.classeAtual}\nCLASSE DE CONSUMO SOLICITADA PELO CLIENTE: ${v.classeSolicitada}\nDOCUMENTOS APRESENTADOS: ${v.documentos}\nOBSERVAÇÕES: ${v.observacoes}`;
+return `ATUALIZAÇÃO CADASTRAL — FLAGS DE GERAÇÃO DISTRIBUÍDA\nCLIENTE: ${v.cliente}\nDOCUMENTOS APRESENTADOS: ${v.documentos}\nABERTA PARA GARANTIR A EFETIVAÇÃO COMPLETA DO PROCESSO DE TROCA DE TITULARIDADE DA UNIDADE GERADORA. ESSA ETAPA É PARA A ATIVAÇÃO E MANUTENÇÃO DOS FLAGS DE GERAÇÃO DISTRIBUÍDA NO SISTEMA, ASSEGURANDO QUE A UNIDADE GERADORA CONTINUE DEVIDAMENTE CONFIGURADA PARA PARTICIPAÇÃO NO SISTEMA DE COMPENSAÇÃO DE ENERGIA ELÉTRICA (SCEE) E ATENDENDO ÀS REGULAMENTAÇÕES VIGENTES.\nOBSERVAÇÕES: ${v.observacoes}`;
+}),
+
+T(31, "Manifestação", [
+F("tipo","Tipo de manifestação",{type:"select",options:["ELOGIO / AGRADECIMENTO","OUTRA MANIFESTAÇÃO"]}), F("agencia","Agência"), F("atendente","Nome do atendente"),
+F("relato","Relato do cliente",{full:true}), F("meio","Meio de resposta",{type:"select",options:["CARTA","TELEFONE","E-MAIL"]}),
+F("telefone","Telefone"), F("email","E-mail"), F("formulario","Formulário de manifestação anexado?",{type:"select",options:["SIM","NÃO"]})
+], v => `${v.tipo==="ELOGIO / AGRADECIMENTO" ? `CLIENTE FEZ QUESTÃO DE AGRADECER PELO ATENDIMENTO RECEBIDO NA AGÊNCIA DE ${v.agencia}, PELA ATENDENTE ${v.atendente}.` : `CLIENTE REGISTRA MANIFESTAÇÃO REFERENTE À AGÊNCIA ${v.agencia}, ATENDENTE ${v.atendente}.`}
+\nRELATO DO CLIENTE: ${v.relato}
+MEIO DE RESPOSTA: ${v.meio}
+TELEFONE: ${v.telefone}
+E-MAIL: ${v.email || "não informado"}
+FORMULÁRIO DE MANIFESTAÇÃO ANEXO NA NOTA: ${v.formulario}.`),
+
+T(32, "Cancelamento de atividade acessória", [
+F("cliente","Nome do cliente"), F("documentos","Documentos apresentados",{placeholder:"RG e CPF"}), F("convenio","Nome do convênio/serviço"), F("valor","Valor cobrado"),
+F("motivo","Motivo do cancelamento",{type:"select",options:["DESCONHECE A COBRANÇA","NÃO TEM MAIS INTERESSE NO SERVIÇO","OUTRO"]}), F("detalhes","Detalhes adicionais",{full:true})
+], v => `${v.cliente} VEIO AO ATENDIMENTO PORTANDO ${v.documentos} PARA SOLICITAR CANCELAMENTO DO CONVÊNIO ${v.convenio}, NO VALOR DE R$ ${v.valor}, POIS ${v.motivo==="DESCONHECE A COBRANÇA" ? "DESCONHECE A COBRANÇA" : v.motivo==="NÃO TEM MAIS INTERESSE NO SERVIÇO" ? "NÃO TEM MAIS INTERESSE NO SERVIÇO" : v.detalhes}. FAVOR SOLICITAR CANCELAMENTO CONFORME SOLICITAÇÃO DO CLIENTE.
+DETALHES: ${v.detalhes}`),
+
+T(33, "Denúncia de fraude", [
+F("anonimo","Denúncia anônima?",{type:"select",options:["SIM","NÃO"]}), F("denunciante","Nome do denunciante (se não anônimo)"), F("descricao","Descrição da denúncia",{full:true}),
+F("responsavel","Nome do responsável, se conhecido"), F("rua","Rua"), F("bairro","Bairro"), F("cidade","Cidade"), F("referencia","Ponto de referência"),
+F("cor","Cor da casa"), F("murada","Casa murada?",{type:"select",options:["SIM","NÃO","NÃO INFORMADO"]}),
+F("medidor","Tem medidor?",{type:"select",options:["SIM","NÃO","NÃO INFORMADO"]}), F("horario","Há horário específico para a fraude?",{type:"select",options:["SIM","NÃO","NÃO INFORMADO"]}),
+F("horarioInfo","Horário específico, se houver")
+], v => `DENÚNCIA ${v.anonimo==="SIM" ? "ANÔNIMA" : "IDENTIFICADA"}
+DESCRIÇÃO DA DENÚNCIA: ${v.descricao || "INFORMA FRAUDE NO FORNECIMENTO DE ENERGIA ELÉTRICA."}
+NOME DO DENUNCIANTE: ${v.anonimo==="SIM" ? "ANÔNIMO" : v.denunciante}
+NOME DO RESPONSÁVEL: ${v.responsavel}
+RUA: ${v.rua}
+BAIRRO: ${v.bairro}
+CIDADE: ${v.cidade}
+PONTO DE REFERÊNCIA: ${v.referencia}
+COR DA CASA: ${v.cor}
+CASA MURADA: ${v.murada}
+TEM MEDIDOR: ${v.medidor}
+TEM HORÁRIO ESPECÍFICO PARA A FRAUDE: ${v.horario}${v.horario==="SIM" ? " — "+v.horarioInfo : ""}
+FAVOR VERIFICAR.`)
+];
+
+const topicList = document.getElementById("topicList");
+const fieldsContainer = document.getElementById("fields");
+const heading = document.getElementById("formHeading");
+const form = document.getElementById("templateForm");
+const output = document.getElementById("output");
+const status = document.getElementById("status");
+const search = document.getElementById("searchTopics");
+let selectedTopic = null;
+
+function renderTopicList(filter = "") {
+    topicList.innerHTML = "";
+    const filtered = topics.filter(topic => topic.title.toLowerCase().includes(filter.toLowerCase()));
+    if (!filtered.length) {
+        topicList.innerHTML = '<div class="empty">Nenhum tópico encontrado.</div>';
+        return;
+    }
+    filtered.forEach(topic => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "topic-button" + (selectedTopic?.id === topic.id ? " active" : "");
+        button.innerHTML = `<span class="topic-number">${String(topic.id).padStart(2, "0")}</span>${topic.title}`;
+        button.addEventListener("click", () => selectTopic(topic.id));
+        topicList.appendChild(button);
+    });
+}
+
+function selectTopic(id) {
+    selectedTopic = topics.find(topic => topic.id === id);
+    heading.innerHTML = `<h2>${selectedTopic.title}</h2><p class="intro">Preencha os campos abaixo. O texto será montado automaticamente no formato padrão.</p>`;
+    fieldsContainer.innerHTML = "";
+    selectedTopic.fields.forEach(field => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "field" + (field.full ? " full" : "");
+        const label = document.createElement("label");
+        label.htmlFor = `field-${field.key}`;
+        label.textContent = field.label;
+        wrapper.appendChild(label);
+        let input;
+        if (field.type === "select") {
+            input = document.createElement("select");
+            const placeholder = document.createElement("option");
+            placeholder.value = "";
+            placeholder.textContent = "Selecione...";
+            input.appendChild(placeholder);
+            field.options.forEach(option => {
+                const item = document.createElement("option");
+                item.value = option;
+                item.textContent = option;
+                input.appendChild(item);
+            });
+        } else if (field.full || field.label.length > 75) {
+            input = document.createElement("textarea");
+            input.placeholder = field.placeholder || "Digite aqui...";
+        } else {
+            input = document.createElement("input");
+            input.type = "text";
+            input.placeholder = field.placeholder || "Preencha aqui...";
+        }
+        input.id = `field-${field.key}`;
+        input.name = field.key;
+        input.autocomplete = "off";
+        wrapper.appendChild(input);
+        fieldsContainer.appendChild(wrapper);
+    });
+    output.value = "";
+    status.textContent = "";
+    renderTopicList(search.value);
+}
+
+form.addEventListener("submit", event => {
+    event.preventDefault();
+    if (!selectedTopic) return;
+    const values = {};
+    selectedTopic.fields.forEach(field => {
+        const element = form.elements[field.key];
+        values[field.key] = (element?.value || "").trim();
+    });
+    output.value = selectedTopic.build(values).replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+    status.textContent = "Texto criado. Confira as informações antes de copiar.";
+});
+
+document.getElementById("clearButton").addEventListener("click", () => {
+    if (!selectedTopic) return;
+    selectedTopic.fields.forEach(field => {
+        const element = form.elements[field.key];
+        if (element) element.value = "";
+    });
+    output.value = "";
+    status.textContent = "Campos limpos.";
+});
+
+document.getElementById("copyButton").addEventListener("click", async () => {
+    if (!output.value.trim()) {
+        status.textContent = "Gere um texto antes de copiar.";
+        return;
+    }
+    try {
+        await navigator.clipboard.writeText(output.value);
+        status.textContent = "Texto copiado para a área de transferência.";
+    } catch {
+        output.focus();
+        output.select();
+        const copied = document.execCommand("copy");
+        status.textContent = copied ? "Texto copiado para a área de transferência." : "Não foi possível copiar automaticamente. Use Ctrl+C.";
+    }
+});
+
+document.getElementById("selectButton").addEventListener("click", () => {
+    output.focus();
+    output.select();
+    status.textContent = "Texto selecionado. Use Ctrl+C para copiar.";
+});
+
+search.addEventListener("input", () => renderTopicList(search.value));
+renderTopicList();
+</script>
+</body>
+</html>
