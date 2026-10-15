@@ -350,12 +350,12 @@ F("rg","RG"), F("cpf","CPF"), F("mes","Mês/ano da fatura",{placeholder:"MM/AAAA
 ], v => `SR(A). ${v.nome} (${v.vinculo}), RG ${v.rg}, CPF ${v.cpf}, SOLICITA A SEGUNDA VIA DA FATURA DO MÊS ${v.mes}, NO VALOR DE R$ ${v.valor}.`),
 
 T(10, "Religação", [
-F("tipo","Tipo de religação",{type:"select",options:["COMUM","URGÊNCIA"]}), F("solicitante","Nome do solicitante"), F("meses","Faturas apresentadas / meses",{full:true}),
+F("tipo","PERGUNTA: COMUM OU URGÊNCIA?",{type:"select",options:["COMUM","URGÊNCIA"]}), F("instalacao","Tipo de instalação",{type:"select",options:["MONOFÁSICO","BIFÁSICO","TRIFÁSICO","GRUPO A"]}),
+F("taxa","Valor da taxa correspondente",{type:"select",options:[]}), F("solicitante","Nome do solicitante"), F("meses","Faturas apresentadas / meses",{full:true}),
 F("vencimentos","Vencimentos",{full:true}), F("pagamentoTipo","Tipo de pagamento"), F("pagamentoData","Data do pagamento",{placeholder:"DD/MM/AAAA"}),
 F("cnr","Fatura CNR?",{type:"select",options:["NÃO","SIM"]}), F("cnrInfo","Referência e valor CNR"),
 F("bloqueadas","Faturas bloqueadas?",{type:"select",options:["NÃO","SIM"]}), F("bloqueadasInfo","Referência e valor das bloqueadas"),
 F("prescritas","Faturas prescritas?",{type:"select",options:["NÃO","SIM"]}), F("prescritasInfo","Referência e valor das prescritas"),
-F("taxa","Taxa de religação informada",{type:"select",options:["MONOFÁSICO — R$ 11,30","BIFÁSICO — R$ 15,57","TRIFÁSICO — R$ 46,75","ALTA TENSÃO — R$ 141,78"]}),
 F("receita","CPF/CNPJ consultado na Receita Federal e situação regular/ativa?",{type:"select",options:["SIM","NÃO"]})
 ], v => `EQUIPE, CLIENTE SOLICITA RELIGAÇÃO ${v.tipo}. COMPROVANTE DE PAGAMENTO APRESENTADO NA AGÊNCIA.
 SOLICITANTE: ${v.solicitante}
@@ -365,6 +365,7 @@ TIPO E DATA DO PAGAMENTO: ${v.pagamentoTipo} — ${v.pagamentoData}
 FATURA CNR: ${v.cnr}${v.cnr==="SIM" ? " — "+v.cnrInfo : ""}
 FATURAS BLOQUEADAS: ${v.bloqueadas}${v.bloqueadas==="SIM" ? " — "+v.bloqueadasInfo : ""}
 FATURAS PRESCRITAS: ${v.prescritas}${v.prescritas==="SIM" ? " — "+v.prescritasInfo : ""}
+TIPO DE INSTALAÇÃO: ${v.instalacao}
 CLIENTE CIENTE DA TAXA DE RELIGAÇÃO: ${v.taxa}
 CPF/CNPJ CONSULTADO NO SITE DA RECEITA FEDERAL, COM SITUAÇÃO CADASTRAL REGULAR/ATIVA NO MOMENTO DO ATENDIMENTO: ${v.receita}.`),
 
@@ -675,6 +676,43 @@ function selectTopic(id) {
         wrapper.appendChild(input);
         fieldsContainer.appendChild(wrapper);
     });
+
+    if (selectedTopic.id === 10) {
+        const tipoSelect = form.elements["tipo"];
+        const instalacaoSelect = form.elements["instalacao"];
+        const taxaSelect = form.elements["taxa"];
+
+        function atualizarTaxaReligacao() {
+            const tipo = tipoSelect.value;
+            const instalacao = instalacaoSelect.value;
+            const taxas = {
+                "COMUM|MONOFÁSICO": "MONOFÁSICO — R$ 11,81",
+                "COMUM|BIFÁSICO": "BIFÁSICO — R$ 16,27",
+                "COMUM|TRIFÁSICO": "TRIFÁSICO — R$ 48,86",
+                "COMUM|GRUPO A": "GRUPO A — R$ 148,19",
+                "URGÊNCIA|MONOFÁSICO": "MONOFÁSICO — R$ 59,25",
+                "URGÊNCIA|BIFÁSICO": "BIFÁSICO — R$ 88,90",
+                "URGÊNCIA|TRIFÁSICO": "TRIFÁSICO — R$ 148,19",
+                "URGÊNCIA|GRUPO A": "GRUPO A — R$ 296,38"
+            };
+            const chave = `${tipo}|${instalacao}`;
+            const valor = taxas[chave] || "";
+
+            taxaSelect.innerHTML = "";
+            const opcao = document.createElement("option");
+            opcao.value = valor;
+            opcao.textContent = valor || (tipo && instalacao
+                ? "VALOR NÃO CADASTRADO PARA ESTA ESCOLHA"
+                : "Selecione a modalidade e o tipo de instalação...");
+            taxaSelect.appendChild(opcao);
+            taxaSelect.value = valor;
+        }
+
+        tipoSelect.addEventListener("change", atualizarTaxaReligacao);
+        instalacaoSelect.addEventListener("change", atualizarTaxaReligacao);
+        atualizarTaxaReligacao();
+    }
+
     output.value = "";
     status.textContent = "";
     renderTopicList(search.value);
