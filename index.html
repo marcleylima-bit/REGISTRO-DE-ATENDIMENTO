@@ -6,6 +6,23 @@
 <title>Controle de Textos Padrão</title>
 <style>
 :root {
+    color-scheme: dark;
+    --bg: #071426;
+    --panel: #0d2038;
+    --text: #e8f0ff;
+    --muted: #a5b8d5;
+    --line: #263f60;
+    --primary: #2563b9;
+    --primary-dark: #3478d2;
+    --soft: #173b67;
+    --success: #65d6a2;
+    --navy: #071426;
+    --blue-light: #d8e8ff;
+    --control: #091a2e;
+    --hover: #122c4b;
+}
+:root[data-theme="light"] {
+    color-scheme: light;
     --bg: #eef3fa;
     --panel: #ffffff;
     --text: #14233b;
@@ -15,8 +32,8 @@
     --primary-dark: #103765;
     --soft: #e6effb;
     --success: #067647;
-    --navy: #0b1f3a;
-    --blue-light: #d8e8ff;
+    --control: #ffffff;
+    --hover: #f4f7fb;
 }
 * { box-sizing: border-box; }
 body {
@@ -76,11 +93,11 @@ h2 { margin: 0 0 14px; font-size: 1.15rem; }
 .search { width: 100%; margin-bottom: 12px; }
 input, select, textarea {
     width: 100%;
-    border: 1px solid #c7d0dc;
+    border: 1px solid var(--line);
     border-radius: 8px;
     padding: 11px 12px;
     color: var(--text);
-    background: white;
+    background: var(--control);
     font: inherit;
 }
 input:focus, select:focus, textarea:focus {
@@ -118,7 +135,24 @@ button.action:hover { transform: translateY(-1px);
 }
 .primary { color: white; background: var(--primary); }
 .primary:hover { background: var(--primary-dark); }
-.secondary { background: #edf1f6; color: #243247; }
+.secondary { background: var(--hover); color: var(--text); border: 1px solid var(--line) !important; }
+.theme-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 10px;
+    padding: 9px 13px;
+    color: #fff;
+    background: rgba(255,255,255,.10);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+.theme-toggle:hover { background: rgba(255,255,255,.19); }
+@media (max-width: 560px) {
+    .theme-toggle { position: static; margin-top: 14px; }
+}
 .output-wrap { margin-top: 22px; }
 .output-wrap textarea { min-height: 300px; font-family: Consolas, "Courier New", monospace; white-space: pre-wrap; }
 .status { color: var(--success); font-size: .9rem; min-height: 1.4em; margin-top: 8px; }
@@ -143,11 +177,12 @@ button.action:hover { transform: translateY(-1px);
             <div class="brand-mark" aria-hidden="true">ML</div>
             <div>
                 <h1>Controle de Textos Padrão</h1>
-                <p>Equatorial Pará · Paragominas</p>
+                <p>Equatorial</p>
             </div>
         </div>
         <p>Selecione o atendimento, preencha os campos e gere o texto pronto para copiar.</p>
         <div class="creator">Criado por <strong>Marcley Lima</strong></div>
+        <button class="theme-toggle" type="button" id="themeToggle" aria-label="Alternar modo de cor">☀️ Modo claro</button>
     </div>
 </header>
 
@@ -189,6 +224,16 @@ button.action:hover { transform: translateY(-1px);
 </main>
 
 <script>
+const root = document.documentElement;
+const themeToggle = document.getElementById("themeToggle");
+root.dataset.theme = "dark";
+themeToggle.addEventListener("click", () => {
+    const isDark = root.dataset.theme !== "light";
+    root.dataset.theme = isDark ? "light" : "dark";
+    themeToggle.textContent = isDark ? "🌙 Modo escuro" : "☀️ Modo claro";
+    themeToggle.setAttribute("aria-label", isDark ? "Ativar modo escuro" : "Ativar modo claro");
+});
+
 const F = (key, label, options = {}) => ({ key, label, ...options });
 const T = (id, title, fields, build, description = "") => ({ id, title, fields, build, description });
 
