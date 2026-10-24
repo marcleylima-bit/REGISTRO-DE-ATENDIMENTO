@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Autoria do código: Marcley Lima. -->
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -116,7 +117,7 @@ input:focus, select:focus, textarea:focus {
     cursor: pointer;
 }
 .topic-button:hover { background: #243e5e; }
-.topic-button.active { background: var(--soft); border-color: #b6ccff; color: var (--text); font-weight: 700; }
+.topic-button.active { background: var(--soft); border-color: #b6ccff; color: var(--text); font-weight: 700; }
 .topic-number { display: inline-block; width: 28px; color: var(--muted); font-size: .85rem; }
 .intro { color: var(--muted); margin: -5px 0 18px; font-size: .95rem; }
 .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
@@ -224,6 +225,7 @@ button.action:hover { transform: translateY(-1px);
 </main>
 
 <script>
+/* Autoria: Marcley Lima — Controle de Textos Padrão. */
 const root = document.documentElement;
 const themeToggle = document.getElementById("themeToggle");
 root.dataset.theme = "dark";
@@ -543,11 +545,13 @@ T(28, "Troca de padrão", [
 F("tipo","Tipo de solicitação",{type:"select",options:["COM ACRÉSCIMO DE CARGA","SEM ACRÉSCIMO DE CARGA","SEM ACRÉSCIMO — SUBSTITUIÇÃO DE CABO, MANTENDO A FASE"]}),
 F("carga","Carga/fase desejada"), F("referencia","Ponto de referência"), F("telefone","Telefone"), F("cabo","Cabo/bitola"), F("disjuntor","Disjuntor"),
 F("adequacoes","Adequações já realizadas conforme normas?",{type:"select",options:["SIM","NÃO"]}), F("prazo","Prazo informado",{placeholder:"5 dias úteis"}),
+F("carregadores","Possui ou contará com carregadores para veículos elétricos? Informe potência/modelo ou 'Não informado'.",{full:true,placeholder:"Informe potência/modelo ou escreva Não informado"}),
 F("observacoes","Observações adicionais",{full:true})
 ], v => {
 let texto = `SOLICITAÇÃO: ${v.tipo}
 PONTO DE REFERÊNCIA: ${v.referencia}
 TELEFONE: ${v.telefone}
+A INSTALAÇÃO POSSUI OU CONTARÁ COM CARREGADORES PARA VEÍCULOS ELÉTRICOS: ${v.carregadores}
 `;
 if (v.tipo==="SEM ACRÉSCIMO — SUBSTITUIÇÃO DE CABO, MANTENDO A FASE") {
 texto += `CLIENTE COMPARECEU AO ATENDIMENTO SOLICITANDO TROCA DE PADRÃO SEM ACRÉSCIMO. PERMANECERÁ COM A MESMA FASE (${v.carga}), PORÉM DESEJA A SUBSTITUIÇÃO DO RAMAL PARA ${v.cabo}, COM DISJUNTOR DE ${v.disjuntor}. CLIENTE INFORMA QUE JÁ REALIZOU AS DEVIDAS ADEQUAÇÕES: ${v.adequacoes}.`;
@@ -609,13 +613,12 @@ COR DA CASA: ${v.cor}
 CASA MURADA: ${v.murada}
 TEM MEDIDOR: ${v.medidor}
 TEM HORÁRIO ESPECÍFICO PARA A FRAUDE: ${v.horario}${v.horario==="SIM" ? " — "+v.horarioInfo : ""}
-FAVOR VERIFICAR.`)
-    T(34, "Troca de titularidade — documentação faltante", [
-    F("documentos", "Documentos faltantes", {full:true}),
-    F("documentacao", "Documentação necessária, conforme o caso", {
-        type:"textarea", full:true
-    })
-], v => TROCA DE TITULARIDADE
+FAVOR VERIFICAR.`),
+
+T(34, "Troca de titularidade — documentação faltante", [
+F("documentos", "Documentos faltantes", {full:true}),
+F("documentacao", "Documentação necessária, conforme o caso", {full:true})
+], v => `TROCA DE TITULARIDADE
 MOTIVO: DOCUMENTAÇÃO FALTANTE
 
 CLIENTE COMPARECEU À AGÊNCIA DE ATENDIMENTO PARA SOLICITAR TROCA DE TITULARIDADE. PORÉM, NÃO APRESENTOU TODA A DOCUMENTAÇÃO NECESSÁRIA PARA A REALIZAÇÃO DO SERVIÇO.
@@ -626,11 +629,11 @@ ${v.documentos}
 CLIENTE ORIENTADO A APRESENTAR A DOCUMENTAÇÃO PENDENTE PARA DAR CONTINUIDADE À SOLICITAÇÃO DE TROCA DE TITULARIDADE.
 
 DOCUMENTAÇÃO NECESSÁRIA, CONFORME O CASO:
-${v.documentacao}),
+${v.documentacao}`),
 
 T(35, "Troca de titularidade — débitos do solicitante", [
-    F("debitos", "Débitos identificados", {full:true})
-], v => TROCA DE TITULARIDADE
+F("debitos", "Débitos identificados", {full:true})
+], v => `TROCA DE TITULARIDADE
 MOTIVO: DÉBITOS EM NOME DO SOLICITANTE
 
 CLIENTE COMPARECEU À AGÊNCIA DE ATENDIMENTO PARA SOLICITAR TROCA DE TITULARIDADE. DURANTE A ANÁLISE, FORAM IDENTIFICADOS DÉBITOS VINCULADOS AO CPF DO SOLICITANTE.
@@ -638,20 +641,20 @@ CLIENTE COMPARECEU À AGÊNCIA DE ATENDIMENTO PARA SOLICITAR TROCA DE TITULARIDA
 DÉBITOS IDENTIFICADOS:
 ${v.debitos}
 
-CLIENTE ORIENTADO QUANTO À EXISTÊNCIA DOS DÉBITOS QUE ESTÃO CONDICIONANDO A SUA SOLICITAÇÃO.),
+CLIENTE ORIENTADO QUANTO À EXISTÊNCIA DOS DÉBITOS QUE ESTÃO CONDICIONANDO A SUA SOLICITAÇÃO.`),
 
 T(36, "Troca de titularidade — sem procuração", [
-    F("orientacao", "Orientação complementar (opcional)", {full:true})
-], v => TROCA DE TITULARIDADE
+F("orientacao", "Orientação complementar (opcional)", {full:true})
+], v => `TROCA DE TITULARIDADE
 SOLICITANTE SEM PROCURAÇÃO
 
-CLIENTE COMPARECEU À AGÊNCIA DE ATENDIMENTO PARA SOLICITAR TROCA DE TITULARIDADE. PORÉM, NÃO É TITULAR SOLICITANTE E NÃO APRESENTOU PROCURAÇÃO.
+CLIENTE COMPARECEU À AGÊNCIA DE ATENDIMENTO PARA SOLICITAR TROCA DE TITULARIDADE. PORÉM, NÃO É O TITULAR SOLICITANTE E NÃO APRESENTOU PROCURAÇÃO.
 
-ORIENTADO A APRESENTAR DOCUMENTAÇÃO NECESSÁRIA COM PROCURAÇÃO, OU TITULAR SOLICITANTE COMPARECER NA AGÊNCIA DE ATENDIMENTO OU SOLICITAR ATRAVÉS DO SITE DA EMPRESA.${v.orientacao ? "\n" + v.orientacao : ""}),
+ORIENTADO A APRESENTAR A DOCUMENTAÇÃO NECESSÁRIA COM PROCURAÇÃO, OU O TITULAR SOLICITANTE COMPARECER À AGÊNCIA DE ATENDIMENTO OU REALIZAR A SOLICITAÇÃO ATRAVÉS DO SITE DA EMPRESA.${v.orientacao ? "\n" + v.orientacao : ""}`),
 
 T(37, "Ligação nova — documentação faltante", [
-    F("documentos", "Documentos faltantes", {full:true})
-], v => LIGAÇÃO NOVA
+F("documentos", "Documentos faltantes", {full:true})
+], v => `LIGAÇÃO NOVA
 MOTIVO: DOCUMENTAÇÃO FALTANTE
 
 CLIENTE COMPARECEU À AGÊNCIA DE ATENDIMENTO PARA SOLICITAR LIGAÇÃO NOVA. PORÉM, NÃO APRESENTOU TODA A DOCUMENTAÇÃO NECESSÁRIA PARA A REALIZAÇÃO DO SERVIÇO.
@@ -659,20 +662,19 @@ CLIENTE COMPARECEU À AGÊNCIA DE ATENDIMENTO PARA SOLICITAR LIGAÇÃO NOVA. POR
 DOCUMENTOS FALTANTES:
 ${v.documentos}
 
-CLIENTE ORIENTADO A APRESENTAR A DOCUMENTAÇÃO PENDENTE PARA DAR CONTINUIDADE À SOLICITAÇÃO DE TROCA DE TITULARIDADE.
+CLIENTE ORIENTADO A APRESENTAR A DOCUMENTAÇÃO PENDENTE PARA DAR CONTINUIDADE À SOLICITAÇÃO DE LIGAÇÃO NOVA.
 
 DOCUMENTAÇÃO NECESSÁRIA, CONFORME O CASO:
-
 - RG OU DOCUMENTO OFICIAL DE IDENTIFICAÇÃO;
 - CPF, CASO NÃO CONSTE NO DOCUMENTO DE IDENTIFICAÇÃO;
 - DOCUMENTO DE VÍNCULO COM O IMÓVEL;
 - INFORMAÇÕES SOBRE FASE E AMPERAGEM DO DISJUNTOR.
 
-CARTA DE INDEFERIMENTO EM ANEXO),
+CARTA DE INDEFERIMENTO EM ANEXO.`),
 
 T(38, "Ligação nova — débitos do solicitante", [
-    F("debitos", "Débitos identificados", {full:true})
-], v => LIGAÇÃO NOVA
+F("debitos", "Débitos identificados", {full:true})
+], v => `LIGAÇÃO NOVA
 MOTIVO: DÉBITOS EM NOME DO SOLICITANTE
 
 CLIENTE COMPARECEU À AGÊNCIA DE ATENDIMENTO PARA SOLICITAR LIGAÇÃO NOVA. DURANTE A ANÁLISE, FORAM IDENTIFICADOS DÉBITOS VINCULADOS AO CPF DO SOLICITANTE.
@@ -682,24 +684,54 @@ ${v.debitos}
 
 CLIENTE ORIENTADO QUANTO À EXISTÊNCIA DOS DÉBITOS QUE ESTÃO CONDICIONANDO A SUA SOLICITAÇÃO.
 
-CARTA DE INDEFERIMENTO EM ANEXO),
+CARTA DE INDEFERIMENTO EM ANEXO.`),
 
 T(39, "Ligação nova — sem procuração", [
-    F("orientacao", "Orientação complementar (opcional)", {full:true})
-], v => LIGAÇÃO NOVA
+F("orientacao", "Orientação complementar (opcional)", {full:true})
+], v => `LIGAÇÃO NOVA
 SOLICITANTE SEM PROCURAÇÃO
 
-CLIENTE COMPARECEU À AGÊNCIA DE ATENDIMENTO PARA SOLICITAR LIGAÇÃO NOVA. PORÉM, NÃO É TITULAR SOLICITANTE E NÃO APRESENTOU PROCURAÇÃO.
+CLIENTE COMPARECEU À AGÊNCIA DE ATENDIMENTO PARA SOLICITAR LIGAÇÃO NOVA. PORÉM, NÃO É O TITULAR SOLICITANTE E NÃO APRESENTOU PROCURAÇÃO.
 
-ORIENTADO A APRESENTAR DOCUMENTAÇÃO NECESSÁRIA COM PROCURAÇÃO, OU TITULAR SOLICITANTE COMPARECER NA AGÊNCIA DE ATENDIMENTO OU SOLICITAR ATRAVÉS DO SITE DA EMPRESA.${v.orientacao ? "\n" + v.orientacao : ""}),
+ORIENTADO A APRESENTAR A DOCUMENTAÇÃO NECESSÁRIA COM PROCURAÇÃO, OU O TITULAR SOLICITANTE COMPARECER À AGÊNCIA DE ATENDIMENTO OU REALIZAR A SOLICITAÇÃO ATRAVÉS DO SITE DA EMPRESA.${v.orientacao ? "\n" + v.orientacao : ""}`),
 
 T(40, "Consulta de débitos no sistema", [
-    F("cpf", "CPF do solicitante"),
-    F("conta", "Conta contrato"),
-    F("observacoes", "Observações adicionais (opcional)", {full:true})
+F("cpf", "CPF do solicitante"),
+F("conta", "Conta contrato"),
+F("observacoes", "Observações adicionais (opcional)", {full:true})
 ], v => `CONSULTA DE DÉBITOS NO SISTEMA
 
-CLIENTE COMPARECEU À AGÊNCIA DE ATENDIMENTO PARA OBTER INFORMAÇÕES SOBRE DÉBITOS VINCULADOS AO SEU CPF. CLIENTE INFORMADO SOBRE TODOS OS DÉBITOS EM ABERTO VINCULADOS À CONTA CONTRATO ${v.conta}, ATÉ A PRESENTE DATA.
+CLIENTE COMPARECEU À AGÊNCIA DE ATENDIMENTO PARA OBTER INFORMAÇÕES SOBRE DÉBITOS VINCULADOS AO CPF ${v.cpf}. CLIENTE INFORMADO SOBRE OS DÉBITOS EM ABERTO VINCULADOS À CONTA CONTRATO ${v.conta}, ATÉ A PRESENTE DATA.
+
+PRESTADAS ORIENTAÇÕES SOBRE OS CANAIS DE PAGAMENTO DISPONÍVEIS E OS PARÂMETROS PARA PARCELAMENTO DOS DÉBITOS. CLIENTE TAMBÉM INFORMADO SOBRE A POSSIBILIDADE DE REGISTRO DO CPF NOS ÓRGÃOS DE PROTEÇÃO AO CRÉDITO, BEM COMO SOBRE AS RESTRIÇÕES PARA CADASTRAMENTO DE NOVAS CONTAS EM SEU NOME JUNTO À EMPRESA.${v.observacoes ? "\n\nOBSERVAÇÕES: " + v.observacoes : ""}`),
+
+T(41, "Reclamação de conta", [
+F("mes", "Mês da fatura", {placeholder:"MM/AAAA"}),
+F("valor", "Valor da fatura (R$)", {placeholder:"Ex.: 250,00"}),
+F("observacoes", "Observações adicionais (opcional)", {full:true})
+], v => `RECLAMAÇÃO DE CONTA
+
+CLIENTE COMPARECEU À AGÊNCIA DE ATENDIMENTO EM BUSCA DE INFORMAÇÕES REFERENTES À FATURA DO MÊS ${v.mes}, NO VALOR DE R$ ${v.valor}.
+
+CLIENTE ORIENTADO SOBRE A COMPOSIÇÃO DA FATURA, A DATA E O PERÍODO DE FATURAMENTO, OS VALORES REFERENTES ÀS TARIFAS E AOS IMPOSTOS APLICADOS, BEM COMO SOBRE O VALOR COBRADO PELO CONSUMO DE ENERGIA ELÉTRICA.
+
+PRESTADOS ESCLARECIMENTOS SOBRE O CÁLCULO DO CONSUMO, CONSIDERANDO AS LEITURAS ANTERIOR E ATUAL INFORMADAS NA FATURA, A DIFERENÇA ENTRE AS LEITURAS E A QUANTIDADE DE KWH FATURADA.
+
+CLIENTE CIENTE DAS INFORMAÇÕES PRESTADAS E DOS ESCLARECIMENTOS REFERENTES À COMPOSIÇÃO DO VALOR FATURADO.${v.observacoes ? "\n\nOBSERVAÇÕES: " + v.observacoes : ""}`),
+
+T(42, "Reclamação de fatura GD", [
+F("mes", "Mês da fatura", {placeholder:"MM/AAAA"}),
+F("valor", "Valor da fatura (R$)", {placeholder:"Ex.: 250,00"}),
+F("observacoes", "Observações adicionais (opcional)", {full:true})
+], v => `MOTIVO: RECLAMAÇÃO DE FATURA GD – ESCLARECIMENTOS SOBRE COMPENSAÇÃO DE ENERGIA
+
+CLIENTE COMPARECEU À AGÊNCIA DE ATENDIMENTO PARA REGISTRAR RECLAMAÇÃO REFERENTE À FATURA DO MÊS ${v.mes}, NO VALOR DE R$ ${v.valor}, VINCULADA À UNIDADE CONSUMIDORA COM GERAÇÃO DISTRIBUÍDA (GD).
+
+CLIENTE ORIENTADO SOBRE A COMPOSIÇÃO DA FATURA, O PERÍODO DE FATURAMENTO, AS LEITURAS REGISTRADAS, O CONSUMO DE ENERGIA ELÉTRICA NO PERÍODO E A ENERGIA INJETADA NA REDE, CONFORME INFORMAÇÕES DISPONÍVEIS NA FATURA E NO SISTEMA.
+
+PRESTADOS ESCLARECIMENTOS SOBRE A ENERGIA CONSUMIDA, A ENERGIA INJETADA, OS CRÉDITOS DE ENERGIA COMPENSADOS, QUANDO APLICÁVEL, E A FORMA DE CÁLCULO DO CONSUMO FATURADO. CLIENTE TAMBÉM ORIENTADO SOBRE A COMPOSIÇÃO DOS VALORES COBRADOS, INCLUINDO COMPONENTES TARIFÁRIOS, IMPOSTOS, ENCARGOS E DEMAIS ITENS APLICÁVEIS À UNIDADE CONSUMIDORA, CONFORME O ENQUADRAMENTO REGULATÓRIO.
+
+CLIENTE CIENTE DOS ESCLARECIMENTOS PRESTADOS REFERENTES À COMPOSIÇÃO DA FATURA E AOS CRITÉRIOS DE FATURAMENTO E COMPENSAÇÃO DE ENERGIA APLICÁVEIS À SUA UNIDADE CONSUMIDORA.${v.observacoes ? "\n\nOBSERVAÇÕES: " + v.observacoes : ""}`)
 ];
 
 const topicList = document.getElementById("topicList");
@@ -722,38 +754,12 @@ function renderTopicList(filter = "") {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "topic-button" + (selectedTopic?.id === topic.id ? " active" : "");
-        button.innerHTML = `<span class="topic-number">${String(topic.id).padStart(2, "0")}</span>${topic.title}`;
+        const number = document.createElement("span");
+        number.className = "topic-number";
+        number.textContent = String(topic.id).padStart(2, "0");
+        button.append(number, document.createTextNode(topic.title));
         button.addEventListener("click", () => selectTopic(topic.id));
         topicList.appendChild(button);
-    PRESTADAS ORIENTAÇÕES SOBRE OS CANAIS DE PAGAMENTO DISPONÍVEIS E OS PARÂMETROS PARA PARCELAMENTO DOS DÉBITOS. CLIENTE TAMBÉM INFORMADO SOBRE A POSSIBILIDADE DE REGISTRO DO CPF NOS ÓRGÃOS DE PROTEÇÃO AO CRÉDITO, BEM COMO SOBRE AS RESTRIÇÕES PARA CADASTRAMENTO DE NOVAS CONTAS EM SEU NOME JUNTO À EMPRESA.${v.observacoes ? "\n\nOBSERVAÇÕES: " + v.observacoes : ""}),
-
-T(41, "Reclamação de conta", [
-    F("mes", "Mês da fatura", {placeholder:"MM/AAAA"}),
-    F("valor", "Valor da fatura (R$)", {placeholder:"Ex.: 250,00"}),
-    F("observacoes", "Observações adicionais (opcional)", {full:true})
-], v => RECLAMAÇÃO DE CONTA
-
-CLIENTE COMPARECEU À AGÊNCIA DE ATENDIMENTO EM BUSCA DE INFORMAÇÕES REFERENTE À FATURA DO MÊS ${v.mes}, NO VALOR DE R$ ${v.valor}.
-
-CLIENTE ORIENTADO SOBRE A COMPOSIÇÃO DA FATURA, A DATA E O PERÍODO DE FATURAMENTO, OS VALORES REFERENTES ÀS TARIFAS E AOS IMPOSTOS APLICADOS, BEM COMO SOBRE O VALOR COBRADO PELO CONSUMO DE ENERGIA ELÉTRICA.
-
-PRESTADOS ESCLARECIMENTOS SOBRE O CÁLCULO DO CONSUMO, CONSIDERANDO AS LEITURAS ANTERIOR E ATUAL INFORMADAS NA FATURA, A DIFERENÇA ENTRE AS LEITURAS E A QUANTIDADE DE KWH FATURADA.
-
-CLIENTE CIENTE DAS INFORMAÇÕES PRESTADAS E DOS ESCLARECIMENTOS REFERENTES À COMPOSIÇÃO DO VALOR FATURADO.${v.observacoes ? "\n\nOBSERVAÇÕES: " + v.observacoes : ""}),
-
-T(42, "Reclamação de fatura GD", [
-    F("mes", "Mês da fatura", {placeholder:"MM/AAAA"}),
-    F("valor", "Valor da fatura (R$)", {placeholder:"Ex.: 250,00"}),
-    F("observacoes", "Observações adicionais (opcional)", {full:true})
-], v => MOTIVO: RECLAMAÇÃO DE FATURA GD – ESCLARECIMENTOS SOBRE COMPENSAÇÃO DE ENERGIA
-
-CLIENTE COMPARECEU À AGÊNCIA DE ATENDIMENTO PARA REGISTRAR RECLAMAÇÃO REFERENTE À FATURA DO MÊS ${v.mes}, NO VALOR DE R$ ${v.valor}, VINCULADA À UNIDADE CONSUMIDORA COM GERAÇÃO DISTRIBUÍDA (GD).
-
-CLIENTE ORIENTADO SOBRE A COMPOSIÇÃO DA FATURA, O PERÍODO DE FATURAMENTO, AS LEITURAS REGISTRADAS, O CONSUMO DE ENERGIA ELÉTRICA NO PERÍODO E A ENERGIA INJETADA NA REDE, CONFORME INFORMAÇÕES DISPONÍVEIS NA FATURA E NO SISTEMA.
-
-PRESTADOS ESCLARECIMENTOS SOBRE A ENERGIA CONSUMIDA, A ENERGIA INJETADA, OS CRÉDITOS DE ENERGIA COMPENSADOS, QUANDO APLICÁVEL, E A FORMA DE CÁLCULO DO CONSUMO FATURADO. CLIENTE TAMBÉM ORIENTADO SOBRE A COMPOSIÇÃO DOS VALORES COBRADOS, INCLUINDO COMPONENTES TARIFÁRIOS, IMPOSTOS, ENCARGOS E DEMAIS ITENS APLICÁVEIS À UNIDADE CONSUMIDORA, CONFORME O ENQUADRAMENTO REGULATÓRIO.
-
-CLIENTE CIENTE DOS ESCLARECIMENTOS PRESTADOS REFERENTES À COMPOSIÇÃO DA FATURA E AOS CRITÉRIOS DE FATURAMENTO E COMPENSAÇÃO DE ENERGIA APLICÁVEIS À SUA UNIDADE CONSUMIDORA.${v.observacoes ? "\n\nOBSERVAÇÕES: " + v.observacoes : ""}`)
     });
 }
 
